@@ -36,7 +36,7 @@ public class CommandLineController {
     private Integer displayId;
     private File videoFile;
     private String errorMessage;
-    private final List<FrameProcessor> processor = new ArrayList<>();
+    private final List<FrameProcessor> processors = new ArrayList<>();
 
     public CommandLineController(String[] args) {
         this.args = args.clone();
@@ -90,6 +90,28 @@ public class CommandLineController {
                 setDisplayId(1);
             } else if ("-2".equals(arg) || "--monitor-2".equals(arg)) {
                 setDisplayId(2);
+            } else if ("-n".equals(arg) || "--number-frames".equals(arg)) {
+                processors.add(new FrameNumberer());          
+            } else if ("-s".equals(arg) || "--scratch-frames".equals(arg)) {
+                processors.add(new FrameScratcher());
+            } else if ("-f".equals(arg) || "--flicker-frames".equals(arg)) {
+                processors.add(new FrameFlickerer());
+            } else if ("-w".equals(arg) || "--black-and-white".equals(arg)) {
+                processors.add(new FrameBlackAndWhiter());   
+            } else if ("-y".equals(arg) || "--yellow-frames".equals(arg)) {
+                processors.add(new FrameYellower()); 
+            } else if ("-v".equals(arg) || "--vignette-frame".equals(arg)) {
+                processors.add(new FrameVignetter()); 
+            } else if ("-d".equals(arg) || "--dust-frame".equals(arg)) {
+                processors.add(new FrameDuster()); 
+            } else if ("-j".equals(arg) || "--jitter-frames".equals(arg)) {
+                processors.add(new FrameJitterer());
+            } else if ("-m".equals(arg) || "--mottle-frames".equals(arg)) {
+                processors.add(new FrameMottler()); 
+            } else if ("-b".equals(arg) || "--bleed-frames".equals(arg)) {
+                processors.add(new FrameBleeder()); 
+            } else if ("-p".equals(arg) || "--pepper-frames".equals(arg)) {
+                processors.add(new FramePepperer());  
             } else if (arg.startsWith("-")) {
                 errorMessage = "Unknown option: " + arg;
             } else {
@@ -132,6 +154,6 @@ public class CommandLineController {
     }
     
     public List<FrameProcessor> getFrameProcessors(){
-    	return processor;
+    	return processors;
     }
 }
