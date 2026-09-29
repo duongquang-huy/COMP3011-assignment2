@@ -8,6 +8,10 @@
  *
  * Copyright 2026 Simon Ratcliffe
  */
+
+/* 
+ * 2. Duong Quang Huy a2950659 
+ */
 package comp3011;
 
 import java.io.File;
@@ -32,6 +36,7 @@ public class CommandLineController {
     private Integer displayId;
     private File videoFile;
     private String errorMessage;
+    private final List<FrameProcessor> processor = new ArrayList<>();
 
     public CommandLineController(String[] args) {
         this.args = args.clone();
@@ -124,5 +129,9 @@ public class CommandLineController {
         System.out.println("  -x, --maximise     Open the player maximised");
         System.out.println("  -1, --monitor-1    Open the player on display 1");
         System.out.println("  -2, --monitor-2    Open the player on display 2");
+    }
+    
+    public List<FrameProcessor> getFrameProcessors(){
+    	return processor;
     }
 }
