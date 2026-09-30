@@ -15,6 +15,8 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -50,7 +52,10 @@ public class VideoPlayerModel {
     private final Consumer<String> statusChangedHandler;
     private final BiConsumer<Boolean, Boolean> playbackStateChangedHandler;
     private final Consumer<Boolean> audioOutputStateChangedHandler;
-
+    // Multi-Threading fields:
+    private final BlockingQueue<PreparedFrame> frameQueue = new LinkedBlockingQueue<>(2);
+    private volatile boolean isRunning = false;
+    private  Thread processingThread;
     // This is the critical wiring that allows the framework (JavaFX) to call
     // into our model logic every time it goes around its event loop. Every GUI
     // system has an event loop so that button clicks, key presses and window
@@ -640,5 +645,30 @@ public class VideoPlayerModel {
         boolean finished() {
             return offset >= samples.length;
         }
+    }
+    
+    // New method to decode and process frames in background
+    // Put prepared frame in Queue for main thread to run
+    private void decodeFrames() {
+    	// Run until video ended
+    	while(isRunning && playbackOpen) {
+    		try {
+    			// Decode and process next frame
+    			PreparedFrame frame = readNextVideoFrame(); // decode and apply effect
+    			if(frame == null) {
+    				finishPlayback();
+    				break;
+    			}
+    			// Put frame in queue
+    			frameQueue.put(frame);
+    		// Break loop when interrupted	
+    		}catch (InterruptedException e) {
+    			Thread.currentThread().interrupt();
+    			break;
+    		}catch (Exception e) {
+    			handlePlaybackError(e);
+    			break;
+    		}
+    	}
     }
 }
