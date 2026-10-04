@@ -235,8 +235,11 @@ public class VideoPlayerModel {
             openPlaybackResources(startTimestampUs);
             resetPlaybackClock(currentTimestampUs);
             playbackOpen = true;
+            //Start worker thread
+            isRunning = true;
+            processingThread = Thread.ofPlatform().start(this::decodeFrames);
             playbackTimer.start();
-            prepareNextFrame();
+//            prepareNextFrame();
             notifyPlaybackStateChanged();
         } catch (Exception e) {
             handlePlaybackError(e);
@@ -491,6 +494,18 @@ public class VideoPlayerModel {
     }
 
     private void closePlaybackResources() {
+    	//Stop worker thread
+    	isRunning = false;
+    	if (processingThread != null) {
+    		processingThread.interrupt();
+    		try {
+    			processingThread.join(1000); // wait 1s
+    		}catch (InterruptedException e) {
+    			Thread.currentThread().interrupt();
+    		}
+    		processingThread = null;
+    	}
+    	frameQueue.clear(); // Delete exsiting frames in queue
         playbackTimer.stop();
         playbackOpen = false;
         preparedFrame = null;
