@@ -385,9 +385,12 @@ public class VideoPlayerModel {
         writeDueAudio(now);
 
         // Task (2)
-        if (preparedFrame != null && preparedFrame.targetTimeNs() <= now) {
-            // We have a prepared frame ready to go and it is due (or just past due!) so get it up on screen ASAP!
-            displayPreparedFrame(now);
+//        if (preparedFrame != null && preparedFrame.targetTimeNs() <= now) {
+//            // We have a prepared frame ready to go and it is due (or just past due!) so get it up on screen ASAP!
+//            displayPreparedFrame(now);
+//        }
+        if (preparedFrame == null && !pauseRequested) {
+        	preparedFrame = frameQueue.poll(); // Get unlocked frame and return null if queue is empty
         }
 
         // Task (3). We'll try and be nice to the GUI event loop here by queueing the prepareNextFrame call rather than
@@ -395,15 +398,21 @@ public class VideoPlayerModel {
         // to replace this whole block with simple linear control flow logic
         // such as: if (!pauseRequested && preparedFrame == null) prepareNextFrame();
         // to compare.
-        if (!pauseRequested && preparedFrame == null && !prepareNextFrameQueued) {
-            prepareNextFrameQueued = true;
-            Platform.runLater(() -> {
-                prepareNextFrameQueued = false;
-
-                if (!pauseRequested) {
-                    prepareNextFrame();
-                }
-            });
+//        if (!pauseRequested && preparedFrame == null && !prepareNextFrameQueued) {
+//            prepareNextFrameQueued = true;
+//            Platform.runLater(() -> {
+//                prepareNextFrameQueued = false;
+//
+//                if (!pauseRequested) {
+//                    prepareNextFrame();
+//                }
+//            });
+//        }
+        
+        // Display frame if time = now
+        if (preparedFrame != null && preparedFrame.targetTimeNs() <= now) {
+        	displayPreparedFrame(now);
+        	preparedFrame = null;
         }
     }
 
