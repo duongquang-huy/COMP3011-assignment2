@@ -4,7 +4,7 @@
  * 
  * Authors:
  *   1. Simon Ratcliffe, in collaboration with GPT-5.6 Terra
- *   2. <student name and student number insert here upon modification>
+ *   2. Duong Quang Huy a2950659
  *
  * Copyright 2026 Simon Ratcliffe
  */
@@ -45,7 +45,7 @@ public class VideoPlayerApp extends Application {
 
         controller = new VideoPlayerController(
                 commandLineController.isAudioRequested(),
-                commandLineController.getFrameProcessors(),
+                commandLineController.getFrameProcessors(), // Pass processors from command line to model
                 this::setVideoSize);
 
         Scene scene = new Scene(controller.getView().getRoot());

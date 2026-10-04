@@ -4,14 +4,11 @@
  * 
  * Authors:
  *   1. Simon Ratcliffe, in collaboration with GPT-5.6 Terra
- *   2. <student name and student number insert here upon modification>
+ *   2. Duong Quang Huy a2950659 
  *
  * Copyright 2026 Simon Ratcliffe
  */
 
-/* 
- * 2. Duong Quang Huy a2950659 
- */
 package comp3011;
 
 import java.io.File;
@@ -76,7 +73,8 @@ public class CommandLineController {
     public boolean shouldLaunchApplication() {
         return errorMessage == null && videoFile != null;
     }
-
+    
+    // Add new options
     private void parse() {
         List<String> videoFiles = new ArrayList<>();
         for (String arg : args) {
@@ -141,7 +139,8 @@ public class CommandLineController {
         }
         this.displayId = displayId;
     }
-
+    
+    // Display new options
     private void printHelp() {
         System.out.println("Usage: VideoPlayer [options] [video-file]");
         System.out.println();
@@ -170,6 +169,7 @@ public class CommandLineController {
         System.out.println("converts, warms, vignettes, dusts, jitters, mottles, bleeds, then peppers.");
     }
     
+    // Returns the list of frame processors on the command line
     public List<FrameProcessor> getFrameProcessors(){
     	return processors;
     }

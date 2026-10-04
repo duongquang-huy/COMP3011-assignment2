@@ -4,10 +4,12 @@
  * 
  * Authors:
  *   1. Simon Ratcliffe, in collaboration with GPT-5.6 Terra
- *   2. <student name and student number insert here upon modification>
+ *   2. Duong Quang Huy a2950659 
  *
  * Copyright 2026 Simon Ratcliffe
  */
+
+
 package comp3011;
 
 import java.io.File;
@@ -53,9 +55,9 @@ public class VideoPlayerModel {
     private final BiConsumer<Boolean, Boolean> playbackStateChangedHandler;
     private final Consumer<Boolean> audioOutputStateChangedHandler;
     // Multi-Threading fields:
-    private final BlockingQueue<PreparedFrame> frameQueue = new LinkedBlockingQueue<>(2);
-    private volatile boolean isRunning = false;
-    private  Thread processingThread;
+    private final BlockingQueue<PreparedFrame> frameQueue = new LinkedBlockingQueue<>(2); // Stores up to 2 frames so worker does not get to far of the display
+    private volatile boolean isRunning = false; // Volatitle to ensure all thread can see lastest value of isRunning
+    private  Thread processingThread; // Reference to worker thread for controlled shutdown
     // This is the critical wiring that allows the framework (JavaFX) to call
     // into our model logic every time it goes around its event loop. Every GUI
     // system has an event loop so that button clicks, key presses and window
@@ -389,6 +391,8 @@ public class VideoPlayerModel {
 //            // We have a prepared frame ready to go and it is due (or just past due!) so get it up on screen ASAP!
 //            displayPreparedFrame(now);
 //        }
+        
+        // Poll frame from queue without blocking
         if (preparedFrame == null && !pauseRequested) {
         	preparedFrame = frameQueue.poll(); // Get unlocked frame and return null if queue is empty
         }
@@ -409,7 +413,8 @@ public class VideoPlayerModel {
 //            });
 //        }
         
-        // Display frame if time = now
+        // Display frame when it is frame to display
+        // Clear preparedFrame so the poll() can get next frame
         if (preparedFrame != null && preparedFrame.targetTimeNs() <= now) {
         	displayPreparedFrame(now);
         	preparedFrame = null;
@@ -503,7 +508,8 @@ public class VideoPlayerModel {
     }
 
     private void closePlaybackResources() {
-    	//Stop worker thread
+    	//Stop worker thread before close resources
+    	// interupt() the thread if it is waiting
     	isRunning = false;
     	if (processingThread != null) {
     		processingThread.interrupt();
